@@ -1,0 +1,13 @@
+### Create valid Person
+POST http://localhost:8080/person
+Content-Type: application/json
+
+{
+  "name": "John",
+  "surname": "Doe",
+  "email": "john@email.com"
+}
+
+### Get People
+GET http://localhost:8080/person
+Content-Type: application/json
