@@ -1,14 +1,18 @@
 package com.example.core.port.persistence;
 
-import com.example.core.dto.request.CreatePersonRequest;
-import com.example.core.dto.response.CreatePersonResponse;
-import com.example.core.dto.response.PersonResponse;
+import com.example.core.model.PersonModel;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface PersonPersistencePort {
 
-    CreatePersonResponse save(CreatePersonRequest createPersonRequest);
+    PersonModel save(PersonModel personModel);
 
-    List<PersonResponse> findAll();
+    List<PersonModel> findAll();
+
+    Optional<PersonModel> findById(UUID id);
+
+    void delete(PersonModel person);
 }

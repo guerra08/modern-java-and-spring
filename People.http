@@ -11,3 +11,7 @@ Content-Type: application/json
 ### Get People
 GET http://localhost:8080/person
 Content-Type: application/json
+
+### Get Person
+GET http://localhost:8080/person/47fe2c85-71cf-4dc6-bb28-e5102ef6f789
+Content-Type: application/json

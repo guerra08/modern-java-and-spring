@@ -1,4 +1,4 @@
-package com.example.core.dto.response;
+package com.example.application.rest.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

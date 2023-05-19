@@ -1,12 +1,17 @@
 package com.example.core.port.business;
 
-import com.example.core.dto.request.CreatePersonRequest;
-import com.example.core.dto.response.CreatePersonResponse;
-import com.example.core.dto.response.PersonResponse;
+import com.example.core.model.PersonModel;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface PersonServicePort {
-    CreatePersonResponse create(CreatePersonRequest createPersonRequest);
-    List<PersonResponse> findAll();
+    PersonModel create(PersonModel personModel);
+
+    List<PersonModel> findAll();
+
+    Optional<PersonModel> findPerson(UUID id);
+
+    void deletePerson(UUID id);
 }

@@ -1,12 +1,13 @@
 package com.example.core.business;
 
-import com.example.core.dto.request.CreatePersonRequest;
-import com.example.core.dto.response.CreatePersonResponse;
-import com.example.core.dto.response.PersonResponse;
+import com.example.core.exception.PersonNotFoundException;
+import com.example.core.model.PersonModel;
 import com.example.core.port.business.PersonServicePort;
 import com.example.core.port.persistence.PersonPersistencePort;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PersonService implements PersonServicePort {
 
@@ -17,12 +18,26 @@ public class PersonService implements PersonServicePort {
     }
 
     @Override
-    public CreatePersonResponse create(CreatePersonRequest createPersonRequest) {
-        return personPersistencePort.save(createPersonRequest);
+    public PersonModel create(PersonModel personModel) {
+        return personPersistencePort.save(personModel);
     }
 
     @Override
-    public List<PersonResponse> findAll() {
+    public List<PersonModel> findAll() {
         return personPersistencePort.findAll();
+    }
+
+    @Override
+    public Optional<PersonModel> findPerson(UUID id) {
+        return personPersistencePort.findById(id);
+    }
+
+    @Override
+    public void deletePerson(UUID id) {
+        findPerson(id)
+            .ifPresentOrElse(personPersistencePort::delete,
+                () -> {
+                    throw new PersonNotFoundException(String.format("Unable to find Person with id [%s].", id));
+                });
     }
 }

@@ -13,7 +13,7 @@ public class BeanConfiguration {
 
     @Bean
     public PersonPersistencePort personPersistencePort(
-            PersonRepository personRepository) {
+        PersonRepository personRepository) {
         return new PersonPersistenceAdapter(personRepository);
     }
 

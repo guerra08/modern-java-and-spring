@@ -1,5 +1,6 @@
 package com.example.infrastructure.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@Table
+@Table(name = "person")
 @Entity
 public class Person {
 
@@ -21,6 +22,7 @@ public class Person {
     private UUID id;
     private String name;
     private String surname;
+    @Column(unique = true)
     private String email;
     private LocalDateTime createdAt;
 
