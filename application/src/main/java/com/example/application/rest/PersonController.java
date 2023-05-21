@@ -1,9 +1,10 @@
 package com.example.application.rest;
 
 import com.example.application.rest.dto.request.CreatePersonRequest;
-import com.example.application.rest.dto.response.CreatePersonResponse;
 import com.example.application.rest.dto.response.PersonResponse;
 import com.example.application.rest.mapper.PersonRestMapper;
+import com.example.core.data.CreatePersonResult;
+import com.example.core.data.DeletePersonResult;
 import com.example.core.port.business.PersonServicePort;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
@@ -48,16 +49,20 @@ public class PersonController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<PersonResponse> deletePerson(@PathVariable UUID id) {
-        personServicePort.deletePerson(id);
-        return ResponseEntity.noContent().build();
+        return switch (personServicePort.deletePerson(id)) {
+            case DeletePersonResult.Success() -> ResponseEntity.noContent().build();
+            case DeletePersonResult.NotFound() -> ResponseEntity.notFound().build();
+        };
     }
 
     @PostMapping
-    public ResponseEntity<CreatePersonResponse> createPerson(@Valid @RequestBody CreatePersonRequest createPersonRequest) {
+    public ResponseEntity<Object> createPerson(@Valid @RequestBody CreatePersonRequest createPersonRequest) {
         var result = personServicePort.create(personRestMapper.toModel(createPersonRequest));
-        URI location = URI.create("/person/" + result.id());
-        return ResponseEntity.created(location)
-            .body(personRestMapper.toCreatePersonResponse(result));
+        return switch (result) {
+            case CreatePersonResult.Success(var value) ->
+                ResponseEntity.created(URI.create("/person/" + value.id())).body(personRestMapper.toCreatePersonResponse(value));
+            case CreatePersonResult.Error(var reason) -> ResponseEntity.badRequest().body(reason);
+        };
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.core.business;
 
-import com.example.core.exception.PersonNotFoundException;
+import com.example.core.data.CreatePersonResult;
+import com.example.core.data.DeletePersonResult;
 import com.example.core.model.PersonModel;
 import com.example.core.port.business.PersonServicePort;
 import com.example.core.port.persistence.PersonPersistencePort;
@@ -18,8 +19,11 @@ public class PersonService implements PersonServicePort {
     }
 
     @Override
-    public PersonModel create(PersonModel personModel) {
-        return personPersistencePort.save(personModel);
+    public CreatePersonResult create(PersonModel personModel) {
+        if (personPersistencePort.existsByEmail(personModel.email())) {
+            return new CreatePersonResult.Error("Email already exists.");
+        }
+        return new CreatePersonResult.Success(personPersistencePort.save(personModel));
     }
 
     @Override
@@ -33,11 +37,12 @@ public class PersonService implements PersonServicePort {
     }
 
     @Override
-    public void deletePerson(UUID id) {
-        findPerson(id)
-            .ifPresentOrElse(personPersistencePort::delete,
-                () -> {
-                    throw new PersonNotFoundException(String.format("Unable to find Person with id [%s].", id));
-                });
+    public DeletePersonResult deletePerson(UUID id) {
+        return findPerson(id)
+            .<DeletePersonResult>map(person -> {
+                personPersistencePort.delete(person);
+                return new DeletePersonResult.Success();
+            })
+            .orElse(new DeletePersonResult.NotFound());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.core.business;
 
-import com.example.core.exception.PersonNotFoundException;
+import com.example.core.data.CreatePersonResult;
+import com.example.core.data.DeletePersonResult;
 import com.example.core.model.PersonModel;
 import com.example.core.port.business.PersonServicePort;
 import com.example.core.port.persistence.PersonPersistencePort;
@@ -28,11 +29,32 @@ class PersonServiceTests {
         var result = sut.create(mockedPerson);
 
         assertNotNull(result);
-        assertThat(result)
-            .usingRecursiveComparison()
-            .isEqualTo(mockedPerson);
+        assertInstanceOf(CreatePersonResult.Success.class, result);
 
-        verify(personPersistencePortMock, times(1)).save(mockedPerson);
+        if (result instanceof CreatePersonResult.Success(var value)) {
+            assertThat(value)
+                .usingRecursiveComparison()
+                .isEqualTo(mockedPerson);
+            verify(personPersistencePortMock, times(1)).save(mockedPerson);
+        }
+    }
+
+    @Test
+    void create_fails_on_validation() {
+        var mockedPerson = Instancio.of(PersonModel.class).create();
+        when(personPersistencePortMock.existsByEmail(mockedPerson.email()))
+            .thenReturn(true);
+
+        var result = sut.create(mockedPerson);
+
+        assertNotNull(result);
+        assertInstanceOf(CreatePersonResult.Error.class, result);
+
+        if (result instanceof CreatePersonResult.Error(var reason)) {
+            assertEquals(reason, "Email already exists.");
+            verify(personPersistencePortMock, times(1)).existsByEmail(mockedPerson.email());
+            verify(personPersistencePortMock, times(0)).save(mockedPerson);
+        }
     }
 
     @Test
@@ -83,16 +105,22 @@ class PersonServiceTests {
         when(personPersistencePortMock.findById(mockedPersonModel.id()))
             .thenReturn(Optional.of(mockedPersonModel));
 
-        assertDoesNotThrow(() -> sut.deletePerson(mockedPersonModel.id()));
+        var result = sut.deletePerson(mockedPersonModel.id());
+
+        assertNotNull(result);
+        assertInstanceOf(DeletePersonResult.Success.class, result);
+        verify(personPersistencePortMock, times(1)).delete(mockedPersonModel);
     }
 
     @Test
-    void deletePerson_throws_if_person_does_not_exist() {
+    void deletePerson_returns_not_found() {
         when(personPersistencePortMock.findById(any()))
             .thenReturn(Optional.empty());
 
-        assertThrows(PersonNotFoundException.class,
-            () -> sut.deletePerson(UUID.randomUUID()));
+        var result = sut.deletePerson(UUID.randomUUID());
+
+        assertNotNull(result);
+        assertInstanceOf(DeletePersonResult.NotFound.class, result);
     }
 
 }

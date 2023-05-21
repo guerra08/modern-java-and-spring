@@ -10,6 +10,8 @@ public interface PersonPersistencePort {
 
     PersonModel save(PersonModel personModel);
 
+    boolean existsByEmail(String email);
+
     List<PersonModel> findAll();
 
     Optional<PersonModel> findById(UUID id);

@@ -1,6 +1,5 @@
 package com.example.infrastructure.persistence;
 
-import com.example.core.exception.DuplicatePersonEmailException;
 import com.example.core.model.PersonModel;
 import com.example.core.port.persistence.PersonPersistencePort;
 import com.example.infrastructure.entity.Person;
@@ -52,16 +51,6 @@ class PersonPersistenceAdapterTests {
 
         assertNotNull(result);
         assertTrue(result.isPresent());
-    }
-
-    @Test
-    void create_throws_for_duplicate_email() {
-        var mockedPersonModel = Instancio.of(PersonModel.class).create();
-        when(personRepository.existsByEmail(mockedPersonModel.email()))
-            .thenReturn(true);
-
-        assertThrows(DuplicatePersonEmailException.class,
-            () -> sut.save(mockedPersonModel));
     }
 
     @Test

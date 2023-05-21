@@ -1,6 +1,5 @@
 package com.example.infrastructure.persistence;
 
-import com.example.core.exception.DuplicatePersonEmailException;
 import com.example.core.model.PersonModel;
 import com.example.core.port.persistence.PersonPersistencePort;
 import com.example.infrastructure.entity.Person;
@@ -22,9 +21,6 @@ public class PersonPersistenceAdapter implements PersonPersistencePort {
 
     @Override
     public PersonModel save(PersonModel personModel) {
-        if (personRepository.existsByEmail(personModel.email())) {
-            throw new DuplicatePersonEmailException("A person with the same e-mail already exists!");
-        }
         Person person = Person.builder()
             .id(UUID.randomUUID())
             .email(personModel.email())
@@ -34,6 +30,11 @@ public class PersonPersistenceAdapter implements PersonPersistencePort {
             .build();
         personRepository.save(person);
         return PersonMapper.toModel(person);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return personRepository.existsByEmail(email);
     }
 
     @Override
