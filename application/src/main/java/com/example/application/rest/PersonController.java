@@ -16,6 +16,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import static com.example.application.util.Errors.ofBadRequest;
+
 @RestController
 @RequestMapping("/person")
 @Observed(name = "personController")
@@ -60,8 +62,9 @@ public class PersonController {
         var result = personServicePort.create(personRestMapper.toModel(createPersonRequest));
         return switch (result) {
             case CreatePersonResult.Success(var value) ->
-                ResponseEntity.created(URI.create("/person/" + value.id())).body(personRestMapper.toCreatePersonResponse(value));
-            case CreatePersonResult.Error(var reason) -> ResponseEntity.badRequest().body(reason);
+                ResponseEntity.created(URI.create("/person/" + value.id()))
+                    .body(personRestMapper.toCreatePersonResponse(value));
+            case CreatePersonResult.Error(var reason) -> ResponseEntity.badRequest().body(ofBadRequest(reason));
         };
     }
 
