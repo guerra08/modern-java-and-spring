@@ -6,6 +6,7 @@ import com.example.core.model.PersonModel;
 import com.example.core.port.business.PersonServicePort;
 import com.example.core.port.persistence.PersonPersistencePort;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -15,12 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@DisplayName("[Person Service Tests]")
 class PersonServiceTests {
 
     private final PersonPersistencePort personPersistencePortMock = mock(PersonPersistencePort.class);
     private final PersonServicePort sut = new PersonService(personPersistencePortMock);
 
     @Test
+    @DisplayName("Create creates a new person with success")
     void create_creates_new_person_with_success() {
         var mockedPerson = Instancio.of(PersonModel.class).create();
         when(personPersistencePortMock.save(mockedPerson))
@@ -40,6 +43,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Create fails on validation for duplicate e-mail")
     void create_fails_on_validation() {
         var mockedPerson = Instancio.of(PersonModel.class).create();
         when(personPersistencePortMock.existsByEmail(mockedPerson.email()))
@@ -58,6 +62,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Find all returns all people")
     void findAll_returns_all_people() {
         var mockedPeople = Instancio.ofList(PersonModel.class).size(10).create();
         when(personPersistencePortMock.findAll()).thenReturn(mockedPeople);
@@ -71,6 +76,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Find by id returns Optional with value")
     void findById_returns_optional_with_value() {
         var mockedPerson = Instancio.of(PersonModel.class).create();
         when(personPersistencePortMock.findById(mockedPerson.id()))
@@ -89,6 +95,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Find by id returns empty Optional")
     void findById_returns_empty_optional() {
         when(personPersistencePortMock.findById(any()))
             .thenReturn(Optional.empty());
@@ -100,6 +107,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Delete person should delete person")
     void deletePerson_should_delete_person() {
         var mockedPersonModel = Instancio.of(PersonModel.class).create();
         when(personPersistencePortMock.findById(mockedPersonModel.id()))
@@ -113,6 +121,7 @@ class PersonServiceTests {
     }
 
     @Test
+    @DisplayName("Delete person should return not found")
     void deletePerson_returns_not_found() {
         when(personPersistencePortMock.findById(any()))
             .thenReturn(Optional.empty());

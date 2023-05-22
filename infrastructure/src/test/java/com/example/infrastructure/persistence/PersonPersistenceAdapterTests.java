@@ -5,6 +5,7 @@ import com.example.core.port.persistence.PersonPersistencePort;
 import com.example.infrastructure.entity.Person;
 import com.example.infrastructure.repository.PersonRepository;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -16,12 +17,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@DisplayName("[Person Persistence Adapter Tests]")
 class PersonPersistenceAdapterTests {
 
     private final PersonRepository personRepository = mock(PersonRepository.class);
     private final PersonPersistencePort sut = new PersonPersistenceAdapter(personRepository);
 
     @Test
+    @DisplayName("Find all should return List of PersonModel")
     void findAll_returns_people() {
         var mockedEntities = Instancio.ofList(Person.class).size(10).create();
         when(personRepository.findAll()).thenReturn(mockedEntities);
@@ -33,6 +36,7 @@ class PersonPersistenceAdapterTests {
     }
 
     @Test
+    @DisplayName("Find by id should return empty Optional")
     void findById_returns_empty_optional() {
         when(personRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -43,6 +47,7 @@ class PersonPersistenceAdapterTests {
     }
 
     @Test
+    @DisplayName("Find by id should return populated Optional")
     void findById_returns_populated_optional() {
         var mockedPerson = Instancio.of(Person.class).create();
         when(personRepository.findById(any())).thenReturn(Optional.of(mockedPerson));
@@ -54,6 +59,7 @@ class PersonPersistenceAdapterTests {
     }
 
     @Test
+    @DisplayName("Create returns created person")
     void create_returns_created_person() {
         var mockedPersonModel = Instancio.of(PersonModel.class).create();
         var mockedPerson = Instancio.of(Person.class).create();
@@ -72,6 +78,7 @@ class PersonPersistenceAdapterTests {
     }
 
     @Test
+    @DisplayName("Delete should delete person")
     void delete_should_delete_person() {
         var mockedPersonModel = Instancio.of(PersonModel.class).create();
 
